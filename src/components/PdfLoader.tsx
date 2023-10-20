@@ -7,7 +7,14 @@ interface Props {
   /** See `GlobalWorkerOptionsType`. */
   workerSrc: string;
 
-  url: string;
+  /**
+   * One of two should provided
+   * url - link to pdf file
+   * data - typed array with pdf file content
+   */
+  url?: string;
+  data?: Uint8Array;
+
   beforeLoad: JSX.Element;
   errorMessage?: JSX.Element;
   children: (pdfDocument: PDFDocumentProxy) => JSX.Element;
@@ -44,8 +51,8 @@ export class PdfLoader extends Component<Props, State> {
     }
   }
 
-  componentDidUpdate({ url }: Props) {
-    if (this.props.url !== url) {
+  componentDidUpdate({ url, data }: Props) {
+    if (this.props.url !== url || this.props.data !== data) {
       this.load();
     }
   }
@@ -62,7 +69,7 @@ export class PdfLoader extends Component<Props, State> {
 
   load() {
     const { ownerDocument = document } = this.documentRef.current || {};
-    const { url, cMapUrl, cMapPacked, workerSrc } = this.props;
+    const { url, data, cMapUrl, cMapPacked, workerSrc } = this.props;
     const { pdfDocument: discardedDocument } = this.state;
     this.setState({ pdfDocument: null, error: null });
 
@@ -73,7 +80,7 @@ export class PdfLoader extends Component<Props, State> {
     Promise.resolve()
       .then(() => discardedDocument && discardedDocument.destroy())
       .then(() => {
-        if (!url) {
+        if (!url && !data) {
           return;
         }
 
