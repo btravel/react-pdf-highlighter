@@ -69,7 +69,7 @@ export class PdfLoader extends Component<Props, State> {
 
   load() {
     const { ownerDocument = document } = this.documentRef.current || {};
-    const { url, data, cMapUrl, cMapPacked, workerSrc } = this.props;
+    const { url, data, cMapUrl, cMapPacked, workerSrc, ...rest } = this.props;
     const { pdfDocument: discardedDocument } = this.state;
     this.setState({ pdfDocument: null, error: null });
 
@@ -85,7 +85,8 @@ export class PdfLoader extends Component<Props, State> {
         }
 
         return getDocument({
-          ...this.props,
+          ...rest,
+          ...(url ? { url } : { data }),
           ownerDocument,
           cMapUrl,
           cMapPacked,
